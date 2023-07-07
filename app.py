@@ -65,8 +65,6 @@ def start_publishing(args, plugin, dev, **kwargs):
                     except KeyError:
                         continue
                     # Update the log
-                    print(kwargs.get('debug', 'False'))
-                    print(kwargs)
                     if kwargs.get('debug', 'False'):
                         print('node', timestamp, name, value, kwargs['units'][name], type(value))
                     
