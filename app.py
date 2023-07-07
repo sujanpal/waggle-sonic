@@ -25,6 +25,7 @@ def parse_values(sample, **kwargs):
         return ndict
     except:
         print("no wind data")
+        return False
 
 
 def start_publishing(args, plugin, dev, **kwargs):
