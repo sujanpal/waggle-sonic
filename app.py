@@ -59,7 +59,7 @@ def start_publishing(args, plugin, dev, **kwargs):
             # setup and publish to the node
             if kwargs['node_interval'] > 0:
                 # publish each value in sample
-                for name, key in kwargs['names'].items():
+                for key, name in kwargs['names'].items():
                     try:
                         value = sample[key]
                     except KeyError:
@@ -84,7 +84,7 @@ def start_publishing(args, plugin, dev, **kwargs):
             # setup and publish to the beehive                        
             if kwargs['beehive_interval'] > 0:
                 # publish each value in sample
-                for name, key in kwargs['names'].items():
+                for key, name in kwargs['names'].items():
                     try:
                         value = sample[key]
                     except KeyError:
@@ -92,6 +92,7 @@ def start_publishing(args, plugin, dev, **kwargs):
                     # Update the log
                     if kwargs.get('debug', 'False'):
                         print('beehive', timestamp, name, value, kwargs['units'][name], type(value))
+                        
                     logging.info("beehive publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
                     plugin.publish(name,
                                    value=value,
