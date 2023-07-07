@@ -14,7 +14,7 @@ def parse_values(sample, **kwargs):
         wy = data_raw.split(";")[2]
         wz = data_raw.split(";")[3]
         temp1 = data_raw.split(";")[4]
-        parms = ['Wx','Wy','Wz','Temp']
+        parms = ['U','V','W','T']
         data =  [wx,wy,wz,temp1]
         # Convert the variables to floats
         strip = [float(var) for var in data]
