@@ -102,10 +102,10 @@ def start_publishing(args, plugin, dev, **kwargs):
                                   )
 
 def main(args):
-    publish_names = {"sonic3D.temp" : "T",
-                     "sonic3D.uwind" : "U",
-                     "sonic3D.vwind" : "V",
-                     "sonic3D.wwind" : "W",
+    publish_names = {"T": "sonic3D.temp",
+                    "U": "sonic3D.uwind",
+                    "V": "sonic3D.vwind",
+                    "W": "sonic3D.wwind",
                     }
 
     units = {"sonic3D.temp" : "degrees Celsius",
