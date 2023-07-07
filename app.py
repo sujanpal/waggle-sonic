@@ -24,9 +24,28 @@ def parse_values(sample, **kwargs):
         #print(ndict)
         return ndict
     except:
-        print("no wind data")
         return False
 
+def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
+    for key, name in kwargs_dict['names'].items():
+        try:
+            value = sample[key]
+        except KeyError:
+            continue
+        if kwargs_dict.get('debug', False):
+            print(scope, timestamp, name, value, kwargs_dict['units'][name], type(value))
+        logging.info("%s publishing %s %s units %s type %s", scope, name, value, kwargs_dict['units'][name], str(type(value)))
+        plugin.publish(name,
+                        value=value,
+                        meta={
+                            "units": kwargs_dict['units'][name],
+                            "sensor": "metek-sonic3D",
+                            "missing": '-9999.9',
+                            "description": kwargs_dict['description'][name]
+                        },
+                        scope=scope,
+                        timestamp=timestamp
+                        )
 
 def start_publishing(args, plugin, dev, **kwargs):
     """
@@ -59,49 +78,12 @@ def start_publishing(args, plugin, dev, **kwargs):
             # setup and publish to the node
             if kwargs['node_interval'] > 0:
                 # publish each value in sample
-                for key, name in kwargs['names'].items():
-                    try:
-                        value = sample[key]
-                    except KeyError:
-                        continue
-                    # Update the log
-                    if kwargs.get('debug', 'False'):
-                        print('node', timestamp, name, value, kwargs['units'][name], type(value))
-                    
-                    logging.info("node publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
-                    plugin.publish(name,
-                                   value=value,
-                                   meta={"units" : kwargs['units'][name],
-                                         "sensor" : "metek-sonic3D",
-                                         "missing" : '-9999.9',
-                                         "description" : kwargs['description'][name]
-                                         },
-                                   scope="node",
-                                   timestamp=timestamp
-                                   )
+                publish_data(plugin, sample, timestamp, 'node', kwargs)
+ 
             # setup and publish to the beehive                        
             if kwargs['beehive_interval'] > 0:
-                # publish each value in sample
-                for key, name in kwargs['names'].items():
-                    try:
-                        value = sample[key]
-                    except KeyError:
-                        continue
-                    # Update the log
-                    if kwargs.get('debug', 'False'):
-                        print('beehive', timestamp, name, value, kwargs['units'][name], type(value))
+                publish_data(plugin, sample, timestamp, 'beehive', kwargs)
 
-                    logging.info("beehive publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
-                    plugin.publish(name,
-                                   value=value,
-                                   meta={"units" : kwargs['units'][name],
-                                         "sensor" : "METEK-sonic3D",
-                                         "missing" : '-9999.9',
-                                         "description" : kwargs['description'][name]
-                                        },
-                                   scope="beehive",
-                                   timestamp=timestamp
-                                  )
 
 def main(args):
     publish_names = {"T": "sonic3d.temp",
