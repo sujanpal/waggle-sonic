@@ -21,7 +21,7 @@ def parse_values(sample, **kwargs):
         # Create a dictionary to match the parameters and variables
         ndict = dict(zip(parms, strip))
         # Add the AQT datetime to the dictionary
-        print(ndict)
+        #print(ndict)
         return ndict
     except:
         print("no wind data")
@@ -65,8 +65,11 @@ def start_publishing(args, plugin, dev, **kwargs):
                     except KeyError:
                         continue
                     # Update the log
+                    print(kwargs.get('debug', 'False'))
+                    print(kwargs)
                     if kwargs.get('debug', 'False'):
                         print('node', timestamp, name, value, kwargs['units'][name], type(value))
+                    
                     logging.info("node publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
                     plugin.publish(name,
                                    value=value,
