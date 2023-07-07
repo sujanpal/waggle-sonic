@@ -15,7 +15,7 @@ def parse_values(sample, **kwargs):
         wz = data_raw.split(";")[3]
         temp1 = data_raw.split(";")[4]
         parms = ['U','V','W','T']
-        data =  [wx,wy,wz,temp1]
+        data =  [wx, wy, wz, temp1]
         # Convert the variables to floats
         strip = [float(var) for var in data]
         # Create a dictionary to match the parameters and variables
@@ -92,7 +92,7 @@ def start_publishing(args, plugin, dev, **kwargs):
                     # Update the log
                     if kwargs.get('debug', 'False'):
                         print('beehive', timestamp, name, value, kwargs['units'][name], type(value))
-                        
+
                     logging.info("beehive publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
                     plugin.publish(name,
                                    value=value,
@@ -112,16 +112,16 @@ def main(args):
                     "W": "sonic3d.wwind",
                     }
 
-    units = {"sonic3d.temp" : "degrees Celsius",
-             "sonic3d.uwind" : "m/s",
-             "sonic3d.vwind" : "m/s",
-             "sonic3d.wwind" : "m/s"
+    units = {publish_names['T'] : "degrees Celsius",
+             publish_names['U'] : "m/s",
+             publish_names['V'] : "m/s",
+             publish_names['W'] : "m/s"
              }
     
-    description = {"sonic3d.temp" : "Ambient Temperature",
-                   "sonic3d.uwind" : "E/W wind",
-                   "sonic3d.vwind" : "N/S wind",
-                   "sonic3.wwind" : "Vertical wind"
+    description = {publish_names['T'] : "Ambient Temperature",
+                   publish_names['U'] : "E/W wind",
+                   publish_names['V'] : "N/S wind",
+                   publish_names['W'] : "Vertical wind"
                   }
 
     with Plugin() as plugin, serial.Serial(args.device, baudrate=args.baud_rate, timeout=1.0) as dev:
