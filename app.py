@@ -102,22 +102,22 @@ def start_publishing(args, plugin, dev, **kwargs):
                                   )
 
 def main(args):
-    publish_names = {"T": "sonic3D.temp",
-                    "U": "sonic3D.uwind",
-                    "V": "sonic3D.vwind",
-                    "W": "sonic3D.wwind",
+    publish_names = {"T": "sonic3d.temp",
+                    "U": "sonic3d.uwind",
+                    "V": "sonic3d.vwind",
+                    "W": "sonic3d.wwind",
                     }
 
-    units = {"sonic3D.temp" : "degrees Celsius",
-             "sonic3D.uwind" : "m/s",
-             "sonic3D.vwind" : "m/s",
-             "sonic3D.wwind" : "m/s"
+    units = {"sonic3d.temp" : "degrees Celsius",
+             "sonic3d.uwind" : "m/s",
+             "sonic3d.vwind" : "m/s",
+             "sonic3d.wwind" : "m/s"
              }
     
-    description = {"sonic3D.temp" : "Ambient Temperature",
-                   "sonic3D.uwind" : "E/W wind",
-                   "sonic3D.vwind" : "N/S wind",
-                   "sonic3D.wwind" : "Vertical wind"
+    description = {"sonic3d.temp" : "Ambient Temperature",
+                   "sonic3d.uwind" : "E/W wind",
+                   "sonic3d.vwind" : "N/S wind",
+                   "sonic3.wwind" : "Vertical wind"
                   }
 
     with Plugin() as plugin, serial.Serial(args.device, baudrate=args.baud_rate, timeout=1.0) as dev:
