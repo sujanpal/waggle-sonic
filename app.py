@@ -14,18 +14,38 @@ def parse_values(sample, **kwargs):
         wy = data_raw.split(";")[2]
         wz = data_raw.split(";")[3]
         temp1 = data_raw.split(";")[4]
-        parms = ['Wx','Wy','Wz','Temp']
-        data =  [wx,wy,wz,temp1]
+        parms = ['U','V','W','T']
+        data =  [wx, wy, wz, temp1]
         # Convert the variables to floats
         strip = [float(var) for var in data]
         # Create a dictionary to match the parameters and variables
         ndict = dict(zip(parms, strip))
         # Add the AQT datetime to the dictionary
-        print(ndict)
+        #print(ndict)
         return ndict
     except:
-        print("no wind data")
+        return False
 
+def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
+    for key, name in kwargs_dict['names'].items():
+        try:
+            value = sample[key]
+        except KeyError:
+            continue
+        if kwargs_dict.get('debug', False):
+            print(scope, timestamp, name, value, kwargs_dict['units'][name], type(value))
+        logging.info("%s publishing %s %s units %s type %s", scope, name, value, kwargs_dict['units'][name], str(type(value)))
+        plugin.publish(name,
+                        value=value,
+                        meta={
+                            "units": kwargs_dict['units'][name],
+                            "sensor": "metek-sonic3D",
+                            "missing": '-9999.9',
+                            "description": kwargs_dict['description'][name]
+                        },
+                        scope=scope,
+                        timestamp=timestamp
+                        )
 
 def start_publishing(args, plugin, dev, **kwargs):
     """
@@ -58,65 +78,30 @@ def start_publishing(args, plugin, dev, **kwargs):
             # setup and publish to the node
             if kwargs['node_interval'] > 0:
                 # publish each value in sample
-                for name, key in kwargs['names'].items():
-                    try:
-                        value = sample[key]
-                    except KeyError:
-                        continue
-                    # Update the log
-                    if kwargs.get('debug', 'False'):
-                        print('node', timestamp, name, value, kwargs['units'][name], type(value))
-                    logging.info("node publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
-                    plugin.publish(name,
-                                   value=value,
-                                   meta={"units" : kwargs['units'][name],
-                                         "sensor" : "metek-sonic3D",
-                                         "missing" : '-9999.9',
-                                         "description" : kwargs['description'][name]
-                                         },
-                                   scope="node",
-                                   timestamp=timestamp
-                                   )
+                publish_data(plugin, sample, timestamp, 'node', kwargs)
+ 
             # setup and publish to the beehive                        
             if kwargs['beehive_interval'] > 0:
-                # publish each value in sample
-                for name, key in kwargs['names'].items():
-                    try:
-                        value = sample[key]
-                    except KeyError:
-                        continue
-                    # Update the log
-                    if kwargs.get('debug', 'False'):
-                        print('beehive', timestamp, name, value, kwargs['units'][name], type(value))
-                    logging.info("beehive publishing %s %s units %s type %s", name, value, kwargs['units'][name], str(type(value)))
-                    plugin.publish(name,
-                                   value=value,
-                                   meta={"units" : kwargs['units'][name],
-                                         "sensor" : "METEK-sonic3D",
-                                         "missing" : '-9999.9',
-                                         "description" : kwargs['description'][name]
-                                        },
-                                   scope="beehive",
-                                   timestamp=timestamp
-                                  )
+                publish_data(plugin, sample, timestamp, 'beehive', kwargs)
+
 
 def main(args):
-    publish_names = {"sonic3D.temp" : "T",
-                     "sonic3D.uwind" : "U",
-                     "sonic3D.vwind" : "V",
-                     "sonic3D.wwind" : "W",
+    publish_names = {"T": "sonic3d.temp",
+                    "U": "sonic3d.uwind",
+                    "V": "sonic3d.vwind",
+                    "W": "sonic3d.wwind",
                     }
 
-    units = {"sonic3D.temp" : "degrees Celsius",
-             "sonic3D.uwind" : "m/s",
-             "sonic3D.vwind" : "m/s",
-             "sonic3D.wwind" : "m/s"
+    units = {publish_names['T'] : "degrees Celsius",
+             publish_names['U'] : "m/s",
+             publish_names['V'] : "m/s",
+             publish_names['W'] : "m/s"
              }
     
-    description = {"sonic3D.temp" : "Ambient Temperature",
-                   "sonic3D.uwind" : "E/W wind",
-                   "sonic3D.vwind" : "N/S wind",
-                   "sonic3D.wwind" : "Vertical wind"
+    description = {publish_names['T'] : "Ambient Temperature",
+                   publish_names['U'] : "E/W wind",
+                   publish_names['V'] : "N/S wind",
+                   publish_names['W'] : "Vertical wind"
                   }
 
     with Plugin() as plugin, serial.Serial(args.device, baudrate=args.baud_rate, timeout=1.0) as dev:
