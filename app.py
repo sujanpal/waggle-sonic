@@ -1,14 +1,11 @@
 import serial
 import argparse
-
 import logging
- 
 from waggle.plugin import Plugin, get_timestamp
 
 def parse_values(sample, **kwargs):
     # Note: Sonic has an incoming string 
     data_raw = str(sample,'utf-8').strip()
-    #print(data_raw)
     try:
         wx = data_raw.split(";")[1]
         wy = data_raw.split(";")[2]
@@ -20,17 +17,17 @@ def parse_values(sample, **kwargs):
         strip = [float(var) for var in data]
         # Create a dictionary to match the parameters and variables
         ndict = dict(zip(parms, strip))
-        # Add the AQT datetime to the dictionary
-        #print(ndict)
         return ndict
     except:
-        return False
+        #return False
+        print("no wind data")
 
 def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
     for key, name in kwargs_dict['names'].items():
         try:
             value = sample[key]
         except KeyError:
+            print("KeyError")
             continue
         if kwargs_dict.get('debug', False):
             print(scope, timestamp, name, value, kwargs_dict['units'][name], type(value))
@@ -51,21 +48,9 @@ def start_publishing(args, plugin, dev, **kwargs):
     """
     start_publishing initializes the Visala WXT530
     Begins sampling and publishing data
-
-    Functions
-    ---------
-
-
-    Modules
-    -------
-    plugin
-    logging
-    sched
-    parse
     """
-    # Note: AQT ASCII interface configuration described in manual
+    # Note: METEK Sonic ASCII interface configuration described in manual
     line = dev.readline()
-    # Note: AQT has 1 min data output, need to check if bytes are returned
     if len(line) > 0: 
         # Define the timestamp
         timestamp = get_timestamp()
@@ -79,11 +64,12 @@ def start_publishing(args, plugin, dev, **kwargs):
             if kwargs['node_interval'] > 0:
                 # publish each value in sample
                 publish_data(plugin, sample, timestamp, 'node', kwargs)
+                print("published at node")
  
             # setup and publish to the beehive                        
             if kwargs['beehive_interval'] > 0:
                 publish_data(plugin, sample, timestamp, 'beehive', kwargs)
-
+                print("published at beehive")
 
 def main(args):
     publish_names = {"T": "sonic3d.temp",
