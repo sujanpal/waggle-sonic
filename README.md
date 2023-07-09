@@ -44,3 +44,20 @@ make deploy
 ### 3) Test the plugin
 ```bash
 make run
+
+# Access the data
+```py
+import sage_data_client
+
+df = sage_data_client.query(start="2023-07-09T00:00:00Z",
+                            end="2023-07-09T01:00:00Z", 
+                            filter={
+                                "plugin": "10.31.81.1:5000/local/waggle-sonic3d",
+                                "vsn": "W039",
+                                "sensor": "metek-sonic3D"
+                            }
+)
+
+```
+
+Check a basic [Cookbook](https://github.com/sujanpal/instrument-cookbooks/blob/main/notebooks/METEK_Sonic3D_access.ipynb) for more details.
