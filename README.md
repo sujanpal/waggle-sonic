@@ -61,4 +61,4 @@ df = sage_data_client.query(start="2023-07-09T00:00:00Z",
 
 ```
 
-Check a basic [Cookbook](https://github.com/sujanpal/instrument-cookbooks/blob/main/notebooks/METEK_Sonic3D_access.ipynb) for more details.
+Check out a basic [Cookbook](https://github.com/sujanpal/instrument-cookbooks/blob/main/notebooks/METEK_Sonic3D_access.ipynb) for more details.
