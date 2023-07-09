@@ -21,7 +21,7 @@ The default serial settings for the RS-485 interface are:
 
 ## Data Sample
 Below is a sample of the ASCII formatted data string transmitted from the instrument. 
-The specific variables included within the string and their location are displayed at the end. 
+It is in the format **status;x;y;z;T;vel;dir;vels;dirs**
 ```bash
 1B010000322000000300100000000000;-0.015;0.053;0.062;16.486;0.055;164.451;0.055;1
 ``` 
@@ -44,14 +44,3 @@ make deploy
 ### 3) Test the plugin
 ```bash
 make run
-
-**METEK uSonic-3 3D Ultrasonic Anemometer Waggle Plugin** <br>
-Waggle Sensor Plug-In for the [uSonic-3 CLASS-A MP](https://metek.de/product/usonic-3-class-a/) <br>
-The Sonic 3D provides observations of 3 wind components x, y, z and acoustic temperature T at sampling rate up to 50 Hz.<br>
-<br>
-[Waggle sensor information](https://github.com/waggle-sensor)<br>
-<br>
-Build of the application was similar to the [Vaisala AQT530 plugin](https://github.com/jrobrien91/waggle-aqt)
-
-**Access the data**<br>
-A basic [Cookbook](https://github.com/sujanpal/instrument-cookbooks/blob/main/notebooks/METEK_Sonic3D_access.ipynb)
