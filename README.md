@@ -46,7 +46,7 @@ make deploy
 make run
 
 # Access the data
-```py
+
 import sage_data_client
 
 df = sage_data_client.query(start="2023-07-09T00:00:00Z",
