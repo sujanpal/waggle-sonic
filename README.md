@@ -6,3 +6,5 @@ The Sonic 3D provides observations of 3 wind components x, y, z and acoustic tem
 <br>
 Build of the application was similar to the [Vaisala AQT530 plugin](https://github.com/jrobrien91/waggle-aqt)
 
+**Access the data**
+[Cookbook](https://github.com/sujanpal/instrument-cookbooks/blob/main/notebooks/METEK_Sonic3D_access.ipynb)
