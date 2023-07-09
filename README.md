@@ -8,12 +8,12 @@ Build of the application was similar to the [Vaisala AQT530 plugin](https://gith
 
 **Access the data**<br>
 import sage_data_client <br>
-df = sage_data_client.query(start="2023-07-09T00:00:00Z",
-                            end="2023-07-09T01:00:00Z", 
-                            filter={
-                                "plugin": "10.31.81.1:5000/local/waggle-sonic3d",
-                                "vsn": "W039",
-                                "sensor": "metek-sonic3D"
-                            }
+df = sage_data_client.query(start="2023-07-09T00:00:00Z", <br>
+                            end="2023-07-09T01:00:00Z", <br>
+                            filter={<br>
+                                "plugin": "10.31.81.1:5000/local/waggle-sonic3d",<br>
+                                "vsn": "W039",<br>
+                                "sensor": "metek-sonic3D"<br>
+                            }<br>
 ) <br>
 Detailed [Cookbook](https://github.com/sujanpal/instrument-cookbooks/blob/main/notebooks/METEK_Sonic3D_access.ipynb)
