@@ -44,6 +44,7 @@ make deploy
 ### 3) Test the plugin
 ```bash
 make run
+``` 
 
 # Access the data
 ```py
