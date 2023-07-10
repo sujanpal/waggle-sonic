@@ -3,16 +3,14 @@ import argparse
 import logging
 from waggle.plugin import Plugin, get_timestamp
 
-def parse_values(sample, **kwargs):
+def parse_values(sample):
     # Note: Sonic has an incoming string 
     data_raw = str(sample,'utf-8').strip()
     try:
-        wx = data_raw.split(";")[1]
-        wy = data_raw.split(";")[2]
-        wz = data_raw.split(";")[3]
-        temp1 = data_raw.split(";")[4]
-        parms = ['U','V','W','T']
-        data =  [wx, wy, wz, temp1]
+
+        # Assumes values be in same order.
+        parms = ['U', 'V', 'W', 'T']
+        data = data_raw.split(";")[1:5]
         # Convert the variables to floats
         strip = [float(var) for var in data]
         # Create a dictionary to match the parameters and variables
@@ -23,6 +21,10 @@ def parse_values(sample, **kwargs):
         print("no wind data")
 
 def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
+    ''' Retrieves the values from sample, 
+    and publishes the data with metadata 
+    to the specified scope using the `plugin.publish`.
+    '''
     for key, name in kwargs_dict['names'].items():
         try:
             value = sample[key]
@@ -46,8 +48,8 @@ def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
 
 def start_publishing(args, plugin, dev, **kwargs):
     """
-    start_publishing initializes the Visala WXT530
-    Begins sampling and publishing data
+    Initializes the Visala WXT530,
+    begins sampling and calls `publish_data`.
     """
     # Note: METEK Sonic ASCII interface configuration described in manual
     line = dev.readline()
@@ -56,7 +58,7 @@ def start_publishing(args, plugin, dev, **kwargs):
         timestamp = get_timestamp()
         logging.debug("Read transmitted data")
         # Check for valid command
-        sample = parse_values(line) 
+        sample = parse_values(line)
     
         # If valid parsed values, send to publishing
         if sample:
