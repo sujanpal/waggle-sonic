@@ -69,12 +69,12 @@ def start_publishing(args, plugin, dev, **kwargs):
             if kwargs['node_interval'] > 0:
                 # publish each value in sample
                 publish_data(plugin, sample, timestamp, 'node', kwargs)
-                print("published at node")
+                #print("published at node")
  
             # setup and publish to the beehive                        
             if kwargs['beehive_interval'] > 0:
                 publish_data(plugin, sample, timestamp, 'beehive', kwargs)
-                print("published at beehive")
+                #print("published at beehive")
         else:
             plugin.publish('status', 'parsing_error')
     else:
@@ -113,8 +113,9 @@ def main(args):
                                  description=description
                                  )
             except Exception as e:
-                print("keyboard interrupt")
-                print(e)
+                plugin.publish('status', e)
+                #print("keyboard interrupt")
+                #print(e)
                 break
 
 if __name__ == '__main__':
