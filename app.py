@@ -3,18 +3,22 @@ import argparse
 import logging
 from waggle.plugin import Plugin, get_timestamp
 
-def parse_values(sample):
+def parse_values(data_string):
+    ''' Extracts values (e.g. 'U', 'V', 'W', 'T') from a data string
+     and returns them as a dictionary if successful, else returns `False`.
+    '''
     # Note: Sonic has an incoming string 
-    data_raw = str(sample,'utf-8').strip()
+    data_raw = str(data_string,'utf-8').strip()
     try:
         # Assumes values be in same order.
         parms = ['U', 'V', 'W', 'T']
         data = data_raw.split(";")[1:5]
-        # Convert the variables to floats
+
+        # Convert the variables from string to floats
         strip = [float(var) for var in data]
         # Create a dictionary to match the parameters and variables
-        ndict = dict(zip(parms, strip))
-        return ndict
+        sample = dict(zip(parms, strip))
+        return sample
     except:
         return False
         #print("no wind data")
