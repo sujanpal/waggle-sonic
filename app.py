@@ -7,7 +7,6 @@ def parse_values(sample):
     # Note: Sonic has an incoming string 
     data_raw = str(sample,'utf-8').strip()
     try:
-
         # Assumes values be in same order.
         parms = ['U', 'V', 'W', 'T']
         data = data_raw.split(";")[1:5]
@@ -17,8 +16,8 @@ def parse_values(sample):
         ndict = dict(zip(parms, strip))
         return ndict
     except:
-        #return False
-        print("no wind data")
+        return False
+        #print("no wind data")
 
 def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
     ''' Retrieves the values from sample, 
@@ -29,7 +28,7 @@ def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
         try:
             value = sample[key]
         except KeyError:
-            print("KeyError")
+            plugin.publish('status', 'KeyError', meta={'var': key})
             continue
         if kwargs_dict.get('debug', False):
             print(scope, timestamp, name, value, kwargs_dict['units'][name], type(value))
@@ -72,6 +71,11 @@ def start_publishing(args, plugin, dev, **kwargs):
             if kwargs['beehive_interval'] > 0:
                 publish_data(plugin, sample, timestamp, 'beehive', kwargs)
                 print("published at beehive")
+        else:
+            plugin.publish('status', 'parsing_error')
+    else:
+        plugin.publish('status', 'device_error')
+
 
 def main(args):
     publish_names = {"T": "sonic3d.temp",
