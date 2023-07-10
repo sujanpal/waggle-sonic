@@ -2,6 +2,8 @@ import serial
 import argparse
 import logging
 from waggle.plugin import Plugin, get_timestamp
+import time
+import sys
 
 def parse_values(data_string):
     ''' Extracts values (e.g. 'U', 'V', 'W', 'T') from a data string
@@ -77,8 +79,11 @@ def start_publishing(args, plugin, dev, **kwargs):
                 #print("published at beehive")
         else:
             plugin.publish('status', 'parsing_error')
+            time.sleep(args.wait)
     else:
         plugin.publish('status', 'device_error')
+        sys.exit(-1)
+
 
 
 def main(args):
@@ -152,6 +157,12 @@ if __name__ == '__main__':
                         type=float,
                         help="interval to publish data to beehive " +
                              "(negative values disable beehive publishing)"
+                        )
+    parser.add_argument("--wait",
+                        default=3.0,
+                        dest='wait',
+                        type=float,
+                        help="wait for device to send the data"
                         )
     args = parser.parse_args()
 
