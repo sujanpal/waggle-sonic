@@ -3,31 +3,36 @@ import argparse
 import logging
 from waggle.plugin import Plugin, get_timestamp
 
-def parse_values(sample, **kwargs):
+def parse_values(data_string):
+    ''' Extracts values (e.g. 'U', 'V', 'W', 'T') from a data string
+     and returns them as a dictionary if successful, else returns `False`.
+    '''
     # Note: Sonic has an incoming string 
-    data_raw = str(sample,'utf-8').strip()
+    data_raw = str(data_string,'utf-8').strip()
     try:
-        wx = data_raw.split(";")[1]
-        wy = data_raw.split(";")[2]
-        wz = data_raw.split(";")[3]
-        temp1 = data_raw.split(";")[4]
-        parms = ['U','V','W','T']
-        data =  [wx, wy, wz, temp1]
-        # Convert the variables to floats
+        # Assumes values be in same order.
+        parms = ['U', 'V', 'W', 'T']
+        data = data_raw.split(";")[1:5]
+
+        # Convert the variables from string to floats
         strip = [float(var) for var in data]
         # Create a dictionary to match the parameters and variables
-        ndict = dict(zip(parms, strip))
-        return ndict
+        sample = dict(zip(parms, strip))
+        return sample
     except:
-        #return False
-        print("no wind data")
+        return False
+        #print("no wind data")
 
 def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
+    ''' Retrieves the values from sample, 
+    and publishes the data with metadata 
+    to the specified scope using the `plugin.publish`.
+    '''
     for key, name in kwargs_dict['names'].items():
         try:
             value = sample[key]
         except KeyError:
-            print("KeyError")
+            plugin.publish('status', 'KeyError', meta={'var': key})
             continue
         if kwargs_dict.get('debug', False):
             print(scope, timestamp, name, value, kwargs_dict['units'][name], type(value))
@@ -46,8 +51,8 @@ def publish_data(plugin, sample, timestamp, scope, kwargs_dict):
 
 def start_publishing(args, plugin, dev, **kwargs):
     """
-    start_publishing initializes the Visala WXT530
-    Begins sampling and publishing data
+    Initializes the Visala WXT530,
+    begins sampling and calls `publish_data`.
     """
     # Note: METEK Sonic ASCII interface configuration described in manual
     line = dev.readline()
@@ -56,7 +61,7 @@ def start_publishing(args, plugin, dev, **kwargs):
         timestamp = get_timestamp()
         logging.debug("Read transmitted data")
         # Check for valid command
-        sample = parse_values(line) 
+        sample = parse_values(line)
     
         # If valid parsed values, send to publishing
         if sample:
@@ -64,12 +69,17 @@ def start_publishing(args, plugin, dev, **kwargs):
             if kwargs['node_interval'] > 0:
                 # publish each value in sample
                 publish_data(plugin, sample, timestamp, 'node', kwargs)
-                print("published at node")
+                #print("published at node")
  
             # setup and publish to the beehive                        
             if kwargs['beehive_interval'] > 0:
                 publish_data(plugin, sample, timestamp, 'beehive', kwargs)
-                print("published at beehive")
+                #print("published at beehive")
+        else:
+            plugin.publish('status', 'parsing_error')
+    else:
+        plugin.publish('status', 'device_error')
+
 
 def main(args):
     publish_names = {"T": "sonic3d.temp",
@@ -103,8 +113,9 @@ def main(args):
                                  description=description
                                  )
             except Exception as e:
-                print("keyboard interrupt")
-                print(e)
+                plugin.publish('status', e)
+                #print("keyboard interrupt")
+                #print(e)
                 break
 
 if __name__ == '__main__':
